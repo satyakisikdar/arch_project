@@ -10,4 +10,4 @@
 7. ```--nonlinear``` - nonlinearity, default: 2.4
 8. ```--online``` - turns on online learning, not enabled by default
 
-Please double check the default values for the IdealDevice. Remember to properly initialize ```arrayIH->Initialization<>``` and ```arrayHO->Initialization<>`` in main. 
+Please double check the default values for the IdealDevice. Remember to properly initialize ```arrayIH->Initialization<>``` and ```arrayHO->Initialization<>``` in main. 
