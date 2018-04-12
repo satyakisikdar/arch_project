@@ -41,7 +41,7 @@
 #include "Cell.h"
 
 //extern float READVOLTAGE;
-extern float SIGMAdTOd;
+extern double SIGMAdTOd, MAXCOND, MINCOND, CONDLEVELS, NONLINEAR;
 
 /* General eNVM */
 void AnalogNVM::WriteEnergyCalculation(double conductance, double conductanceNew, double wireCapCol) {
@@ -114,8 +114,8 @@ void AnalogNVM::WriteEnergyCalculation(double conductance, double conductanceNew
 /* Ideal device (no weight update nonlinearity) */
 IdealDevice::IdealDevice(int x, int y) {
 	this->x = x; this->y = y;	// Cell location: x (column) and y (row) start from index 0
-	maxConductance = 5e-6;		// Maximum cell conductance (S)
-	minConductance = 100e-9;	// Minimum cell conductance (S)
+	maxConductance = MAXCOND;		// Maximum cell conductance (S)
+	minConductance = MINCOND;	// Minimum cell conductance (S)
 	conductance = minConductance;	// Current conductance (S) (dynamic variable)
 	readVoltage = 0.5;	// On-chip read voltage (Vr) (V)
   readPulseWidth = 5e-9;	// Read pulse width (s) (will be determined by ADC)
@@ -124,8 +124,8 @@ IdealDevice::IdealDevice(int x, int y) {
 	writePulseWidthLTP = 10e-9;	// Write pulse width (s) for LTP or weight increase
 	writePulseWidthLTD = 10e-9;	// Write pulse width (s) for LTD or weight decrease
 	writeEnergy = 0;	// Dynamic variable for calculation of write energy (J)
-	maxNumLevelLTP = 63;	// Maximum number of conductance states during LTP or weight increase
-	maxNumLevelLTD = 63;	// Maximum number of conductance states during LTD or weight decrease
+	maxNumLevelLTP = CONDLEVELS;	// Maximum number of conductance states during LTP or weight increase
+	maxNumLevelLTD = CONDLEVELS;	// Maximum number of conductance states during LTD or weight decrease
 	numPulse = 0;	// Number of write pulses used in the most recent write operation (dynamic variable)
 	cmosAccess = true;	// True: Pseudo-crossbar (1T1R), false: cross-point
 	FeFET = false;      // True: FeFET structure (Pseudo-crossbar only, should be cmosAccess=1)
@@ -215,8 +215,8 @@ RealDevice::RealDevice(int x, int y) {
 	localGen.seed(std::time(0));
 
 	/* Device-to-device weight update variation */
-	NL_LTP = 0; // LTP nonlinearity
-	NL_LTD = 0; // LTD nonlinearity
+	NL_LTP = NONLINEAR; // LTP nonlinearity
+	NL_LTD = NONLINEAR; // LTD nonlinearity
 	sigmaDtoD = SIGMAdTOd;	// Sigma of device-to-device weight update vairation in gaussian distribution
 	gaussian_dist2 = new std::normal_distribution<double>(0, sigmaDtoD);	// Set up mean and stddev for device-to-device weight update vairation
 	paramALTP = getParamA(NL_LTP + (*gaussian_dist2)(localGen)) * maxNumLevelLTP;	// Parameter A for LTP nonlinearity

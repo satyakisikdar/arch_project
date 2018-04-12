@@ -39,6 +39,10 @@
 #include "math.h"
 #include "Param.h"
 
+extern int nHIDE;
+extern double ALPHA1, ALPHA2;
+extern bool OFFLINE;
+
 Param::Param() {
 	/* MNIST dataset */
 	numMnistTrainImages = 60000;// # of training images in MNIST
@@ -49,17 +53,22 @@ Param::Param() {
 	totalNumEpochs = 125;	// Total number of epochs
 	interNumEpochs = 1;		// Internal number of epochs (print out the results every interNumEpochs)
 	nInput = 400;     // # of neurons in input layer
-	nHide = 100;      // # of neurons in hidden layer
+	nHide = nHIDE;      // # of neurons in hidden layer
 	nOutput = 10;     // # of neurons in output layer
-	alpha1 = 0.2;	// Learning rate for the weights from input to hidden layer
-	alpha2 = 0.1;	// Learning rate for the weights from hidden to output layer
+	alpha1 = ALPHA1;	// Learning rate for the weights from input to hidden layer
+	alpha2 = ALPHA2;	// Learning rate for the weights from hidden to output layer
 	maxWeight = 1;	// Upper bound of weight value
 	minWeight = 0;	// Lower bound of weight value
 
 	/* Hardware parameters */
-	useHardwareInTrainingFF = true;   // Use hardware in the feed forward part of training or not (true: realistic hardware, false: ideal software)
+
+    useHardwareInTrainingFF = true;   // Use hardware in the feed forward part of training or not (true: realistic hardware, false: ideal software)
 	useHardwareInTrainingWU = true;   // Use hardware in the weight update part of training or not (true: realistic hardware, false: ideal software)
-	useHardwareInTraining = useHardwareInTrainingFF || useHardwareInTrainingWU;    // Use hardware in the training or not
+
+    if (OFFLINE)
+        useHardwareInTraining = false;
+    else
+        useHardwareInTraining = useHardwareInTrainingFF || useHardwareInTrainingWU;    // Use hardware in the training or not
 	useHardwareInTestingFF = true;    // Use hardware in the feed forward part of testing or not (true: realistic hardware, false: ideal software)
 	numBitInput = 1;       // # of bits of the input data (=1 for black and white data)
 	numBitPartialSum = 8;  // # of bits of the digital output (partial weighted sum output)

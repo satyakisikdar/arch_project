@@ -42,6 +42,8 @@
 #include <vector>
 #include <chrono>
 #include <unistd.h>
+#include <getopt.h>
+#include <stdlib.h>
 
 #include "Cell.h"
 #include "Array.h"
@@ -56,23 +58,91 @@
 
 using namespace std;
 
-float SIGMAdTOd;
+// the default values of the command line args
+int nHIDE = 100;
+bool OFFLINE = true;
+double SIGMAdTOd = 0, MAXCOND = 5e-6, MINCOND = 100e-9, CONDLEVELS = 63, NONLINEAR = 2.4;
+double ALPHA1 = 0.2, ALPHA2 = 0.1;
 
 int main(int argc, char **argv)
 {
+    int c;
 
-  float blah;
-  int opt;
-  while ((opt = getopt(argc, argv, "s:")) != -1)
-  {
-    switch (opt)
-    {
-      case 's':
-        SIGMAdTOd = std::atof(optarg);
-        std::cout << "sigmaDtoD: " << SIGMAdTOd << std::endl;
-      break;
-    }
-  }
+    while (1)
+	{
+		static struct option long_options[] =
+		{
+			{"neurons", required_argument, 0, 'n'},
+			{"alpha1", required_argument, 0, 'a'},
+			{"alpha2", required_argument, 0, 'b'},
+			{"maxcond", required_argument, 0, 'm'},
+			{"mincond", required_argument, 0, 'c'},
+			{"condlevels", required_argument, 0, 'd'},
+			{"sigmad", required_argument, 0, 's'},
+			{"nonlinear", required_argument, 0, 'p'},
+			{"online", no_argument, 0, 'o'},
+            {0, 0, 0, 0}
+		};
+		int option_index = 0;
+
+		c = getopt_long_only(argc, argv, "n:a:b:m:c:d:s:p:", long_options, &option_index);
+
+		if (c == -1)
+			break;
+
+		switch (c)
+		{
+			case 'n':
+			  // printf("option -neurons with value `%s'\n", optarg);
+			  nHIDE = std::atoi(optarg);
+              break;
+
+			case 'a':
+			  // printf("option -alpha1 with value `%s'\n", optarg);
+			  ALPHA1 = std::atof(optarg);
+              break;
+
+			case 'b':
+			  // printf("option -alpha2 with value `%s'\n", optarg);
+			  ALPHA2 = std::atof(optarg);
+              break;
+
+			case 'm':
+			  // printf ("option -maxcond with value `%s'\n", optarg);
+			  MAXCOND = std::atof(optarg);
+              break;
+
+			case 'c':
+			  // printf ("option -mincond with value `%s'\n", optarg);
+			  MINCOND = std::atof(optarg);
+              break;
+
+			case 'd':
+			  // printf ("option -condlevels with value `%s'\n", optarg);
+			  CONDLEVELS = std::atof(optarg);
+              break;
+
+			case 's':
+			  // printf ("option -sigmad with value `%s'\n", optarg);
+			  SIGMAdTOd = std::atof(optarg);
+              break;
+
+			case 'p':
+			  // printf ("option -nonlinear with value `%s'\n", optarg);
+			  NONLINEAR = std::atof(optarg);
+              break;
+
+            case 'o':
+              // printf("option -online activated");
+              OFFLINE = false;
+              break;
+
+			default:
+			  abort ();
+		}
+	}
+
+    printf("\nnHIDE: %d, A1: %f, A2: %f, Min Cond: %f, Max Cond: %f, Cond levels: %f, Sigma: %f, Nonlinear: %f, Offline: %d\n", nHIDE, ALPHA1, ALPHA2, MINCOND, MAXCOND, CONDLEVELS, SIGMAdTOd, NONLINEAR, OFFLINE);
 
 	gen.seed(0);
 
@@ -88,7 +158,6 @@ int main(int argc, char **argv)
 	/* Load in MNIST data */
 	ReadTrainingDataFromFile("patch60000_train.txt", "label60000_train.txt");
 	ReadTestingDataFromFile("patch10000_test.txt", "label10000_test.txt");
-
 	/* Initialization of synaptic array from input to hidden layer */
 	arrayIH->Initialization<RealDevice>();
 
