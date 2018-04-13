@@ -8,6 +8,7 @@
 5. ```--mincond``` - minimum conductance, default: 100e-9
 6. ```--condlevels``` - number of conductance levels, default: 63
 7. ```--nonlinear``` - nonlinearity, default: 2.4
-8. ```--online``` - turns on online learning, not enabled by default
+8. ```--online``` - turns on online learning, disabled by default
+9. ```--ideal``` - switches to ideal device, disabled by default 
 
 Please double check the default values for the IdealDevice. Remember to properly initialize ```arrayIH->Initialization<>``` and ```arrayHO->Initialization<>``` in main. 
