@@ -216,7 +216,7 @@ RealDevice::RealDevice(int x, int y) {
 
 	/* Device-to-device weight update variation */
 	NL_LTP = NONLINEAR; // LTP nonlinearity
-	NL_LTD = NONLINEAR; // LTD nonlinearity
+	NL_LTD = -NONLINEAR; // LTD nonlinearity
 	sigmaDtoD = SIGMAdTOd;	// Sigma of device-to-device weight update vairation in gaussian distribution
 	gaussian_dist2 = new std::normal_distribution<double>(0, sigmaDtoD);	// Set up mean and stddev for device-to-device weight update vairation
 	paramALTP = getParamA(NL_LTP + (*gaussian_dist2)(localGen)) * maxNumLevelLTP;	// Parameter A for LTP nonlinearity

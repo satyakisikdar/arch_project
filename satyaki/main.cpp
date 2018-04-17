@@ -60,7 +60,7 @@ using namespace std;
 
 // the default values of the command line args
 int nHIDE = 100;
-bool OFFLINE = true;
+bool OFFLINE = true, REAL = true;
 double SIGMAdTOd = 0, MAXCOND = 5e-6, MINCOND = 100e-9, CONDLEVELS = 63, NONLINEAR = 2.4;
 double ALPHA1 = 0.2, ALPHA2 = 0.1;
 
@@ -81,6 +81,7 @@ int main(int argc, char **argv)
 			{"sigmad", required_argument, 0, 's'},
 			{"nonlinear", required_argument, 0, 'p'},
 			{"online", no_argument, 0, 'o'},
+            {"ideal", no_argument, 0, 'i'},
             {0, 0, 0, 0}
 		};
 		int option_index = 0;
@@ -137,12 +138,19 @@ int main(int argc, char **argv)
               OFFLINE = false;
               break;
 
+            case 'i':
+                REAL = false;
+                break;
+
 			default:
 			  abort ();
 		}
 	}
 
-    printf("\nnHIDE: %d, A1: %f, A2: %f, Min Cond: %f, Max Cond: %f, Cond levels: %f, Sigma: %f, Nonlinear: %f, Offline: %d\n", nHIDE, ALPHA1, ALPHA2, MINCOND, MAXCOND, CONDLEVELS, SIGMAdTOd, NONLINEAR, OFFLINE);
+    printf("\nnHIDE: %d, A1: %f, A2: %f, Min Cond: %f, Max Cond: %f, Cond
+    levels: %f, Sigma: %f, Nonlinear: %f, Offline: %d, REAL:%d\n", nHIDE,
+    ALPHA1, ALPHA2, MINCOND, MAXCOND, CONDLEVELS, SIGMAdTOd, NONLINEAR,
+    OFFLINE, REAL);
 
 	gen.seed(0);
 
@@ -158,12 +166,23 @@ int main(int argc, char **argv)
 	/* Load in MNIST data */
 	ReadTrainingDataFromFile("patch60000_train.txt", "label60000_train.txt");
 	ReadTestingDataFromFile("patch10000_test.txt", "label10000_test.txt");
-	/* Initialization of synaptic array from input to hidden layer */
-	arrayIH->Initialization<RealDevice>();
 
-	/* Initialization of synaptic array from hidden to output layer */
-	arrayHO->Initialization<RealDevice>();
 
+    if (REAL)
+	{
+        /* Initialization of synaptic array from input to hidden layer */
+	    arrayIH->Initialization<RealDevice>();
+
+    	/* Initialization of synaptic array from hidden to output layer */
+	    arrayHO->Initialization<RealDevice>();
+    {
+
+        /* Initialization of synaptic array from input to hidden layer */
+	    arrayIH->Initialization<IdealDevice>();
+
+    	/* Initialization of synaptic array from hidden to output layer */
+	    arrayHO->Initialization<IdealDevice>();
+   }
 	/* Initialization of NeuroSim synaptic cores */
 	param->relaxArrayCellWidth = 0;
 	NeuroSimSubArrayInitialize(subArrayIH, arrayIH, inputParameterIH, techIH, cellIH);
