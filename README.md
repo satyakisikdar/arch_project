@@ -10,5 +10,5 @@
 7. ```--nonlinear``` - nonlinearity, default: 2.4
 8. ```--online``` - turns on online learning, disabled by default
 9. ```--ideal``` - switches to ideal device, disabled by default 
+10. ```--sigmad``` - Sigma for device to device variation. 
 
-Please double check the default values for the IdealDevice. Remember to properly initialize ```arrayIH->Initialization<>``` and ```arrayHO->Initialization<>``` in main. 
